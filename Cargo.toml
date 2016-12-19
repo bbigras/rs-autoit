@@ -1,0 +1,8 @@
+[package]
+name = "autoit"
+version = "0.1.0"
+authors = ["Bruno Bigras <bigras.bruno@gmail.com>"]
+build = "build.rs"
+
+[build-dependencies]
+libbindgen = "0.1.2"
