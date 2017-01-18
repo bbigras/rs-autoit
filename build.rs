@@ -10,7 +10,6 @@ fn main() {
     let bindings = Builder::default()
         .no_unstable_rust()
         .header("wrapper.hpp")
-        .no_unstable_rust()
         .whitelisted_function("AU3_.*")
         .generate()
         .expect("Unable to generate bindings");
