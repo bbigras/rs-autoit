@@ -108,14 +108,14 @@ mod tests {
 
     #[test]
     fn test_autoit() {
-        assert!(!win_exists("rs-autoit test1.txt", None));
+        assert!(!win_exists("rs-autoit test1", None));
 
         let mut notepad = launch_notepad();
 
-        win_wait("rs-autoit test1.txt", None, Some(10));
+        win_wait("rs-autoit test1", None, Some(10));
 
-        assert!(win_exists("rs-autoit test1.txt", None));
-        assert_eq!(win_get_text("rs-autoit test1.txt", None, None), "aéèê\n");
+        assert!(win_exists("rs-autoit test1", None));
+        assert_eq!(win_get_text("rs-autoit test1", None, None), "aéèê\n");
 
         notepad.kill().unwrap();
     }
