@@ -12,4 +12,4 @@ keywords = ["autoit", "autoitx"]
 build = "build.rs"
 
 [build-dependencies]
-libbindgen = "0.1.2"
+bindgen = "0.20"
