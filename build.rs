@@ -8,7 +8,6 @@ fn main() {
     println!("cargo:rustc-link-lib=AutoItX3_x64_DLL");
 
     let bindings = Builder::default()
-        .no_unstable_rust()
         .header("wrapper.hpp")
         .whitelisted_function("AU3_.*")
         .generate()
