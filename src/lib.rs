@@ -1,4 +1,4 @@
-use std::char::decode_utf16;
+use std::char::{decode_utf16, DecodeUtf16Error};
 use std::ptr::null;
 
 mod bindings {
@@ -46,7 +46,7 @@ pub fn win_exists(title: &str, text: Option<&str>) -> bool {
     r == 1
 }
 
-pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> String {
+pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> Result<String, DecodeUtf16Error> {
     let title_ptr = str_to_lpcwstr(title);
     let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
 
@@ -61,8 +61,7 @@ pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> 
     };
 
     decode_utf16(buf.iter().cloned().take_while(|x| *x != '\0' as u16))
-        .map(|y| y.unwrap() as char)
-        .collect::<String>()
+        .collect::<Result<String, DecodeUtf16Error>>()
 }
 
 pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
@@ -106,9 +105,9 @@ mod tests {
         assert!(win_exists("rs-autoit test1", None));
         assert!(win_exists("rs-autoit test1", Some("aéèê")));
         assert!(!win_exists("rs-autoit test1", Some("aéèêT")));
-        assert_eq!(win_get_text("rs-autoit test1", None, None), "aéèê\n");
-        assert_eq!(win_get_text("rs-autoit test1", Some("aéèê"), None), "aéèê\n");
-        assert_ne!(win_get_text("rs-autoit test1", Some("aéèêT"), None), "aéèê\n");
+        assert_eq!(win_get_text("rs-autoit test1", None, None).unwrap(), "aéèê\n");
+        assert_eq!(win_get_text("rs-autoit test1", Some("aéèê"), None).unwrap(), "aéèê\n");
+        assert_ne!(win_get_text("rs-autoit test1", Some("aéèêT"), None).unwrap(), "aéèê\n");
 
         notepad.kill().unwrap();
     }
