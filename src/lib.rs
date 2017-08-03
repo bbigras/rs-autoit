@@ -40,11 +40,7 @@ pub fn mouse_get_pos() -> (i32, i32) {
 
 pub fn win_exists(title: &str, text: Option<&str>) -> bool {
     let title_ptr = str_to_lpcwstr(title);
-    let text_ptr = if let Some(t) = text {
-        str_to_lpcwstr(t)
-    } else {
-        null()
-    };
+    let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
 
     let r = unsafe { bindings::AU3_WinExists(title_ptr, text_ptr) };
     r == 1
@@ -52,11 +48,7 @@ pub fn win_exists(title: &str, text: Option<&str>) -> bool {
 
 pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> String {
     let title_ptr = str_to_lpcwstr(title);
-    let text_ptr = if let Some(t) = text {
-        str_to_lpcwstr(t)
-    } else {
-        null()
-    };
+    let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
 
     let buf_len = buf_len.unwrap_or(1024);
 
@@ -75,11 +67,7 @@ pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> 
 
 pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
     let title_ptr = str_to_lpcwstr(title);
-    let text_ptr = if let Some(t) = text {
-        str_to_lpcwstr(t)
-    } else {
-        null()
-    };
+    let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
 
     let timeout = timeout.unwrap_or(0);
 
@@ -113,9 +101,14 @@ mod tests {
         let mut notepad = launch_notepad();
 
         win_wait("rs-autoit test1", None, Some(10));
+        win_wait("rs-autoit test1", Some("aéèê"), Some(10));
 
         assert!(win_exists("rs-autoit test1", None));
+        assert!(win_exists("rs-autoit test1", Some("aéèê")));
+        assert!(!win_exists("rs-autoit test1", Some("aéèêT")));
         assert_eq!(win_get_text("rs-autoit test1", None, None), "aéèê\n");
+        assert_eq!(win_get_text("rs-autoit test1", Some("aéèê"), None), "aéèê\n");
+        assert_ne!(win_get_text("rs-autoit test1", Some("aéèêT"), None), "aéèê\n");
 
         notepad.kill().unwrap();
     }
