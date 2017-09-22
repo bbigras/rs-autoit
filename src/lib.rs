@@ -84,6 +84,17 @@ pub fn set_option(option: &str, value: i32) {
     };
 }
 
+pub fn win_get_handle(title: &str, text: Option<&str>) -> *mut bindings::HWND__ {
+    let title_ptr = str_to_lpcwstr(title);
+    let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
+
+    let r = unsafe {
+        bindings::AU3_WinGetHandle(title_ptr, text_ptr)
+    };
+
+    r
+}
+
 pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
     let title_ptr = str_to_lpcwstr(title);
     let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
