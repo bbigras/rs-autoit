@@ -11,5 +11,8 @@ license = "Unlicense/MIT"
 keywords = ["autoit", "autoitx"]
 build = "build.rs"
 
+[dependencies]
+widestring = "0.2"
+
 [build-dependencies]
 bindgen = "0.29"
