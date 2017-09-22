@@ -111,15 +111,13 @@ pub fn set_option(option: &str, value: i32) {
 pub fn win_get_handle(title: &str, text: Option<&str>) -> *mut bindings::HWND__ {
     let title_wide = WideCString::from_str(title).unwrap();
 
-    let r = match text {
+    match text {
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), text_wide.as_ptr()) }
         }
         None => unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), null()) },
-    };
-
-    r
+    }
 }
 
 pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
