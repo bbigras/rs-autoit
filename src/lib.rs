@@ -1,6 +1,6 @@
 extern crate widestring;
 
-use std::char::{decode_utf16, DecodeUtf16Error};
+use std::char::{DecodeUtf16Error, decode_utf16};
 use widestring::WideCString;
 
 use std::ptr::null;
@@ -9,7 +9,6 @@ mod bindings {
     #![allow(non_upper_case_globals)]
     #![allow(non_camel_case_types)]
     #![allow(non_snake_case)]
-
     #![allow(dead_code)]
 
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
@@ -44,41 +43,46 @@ pub fn win_exists(title: &str, text: Option<&str>) -> bool {
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe { bindings::AU3_WinExists(title_wide.as_ptr(), text_wide.as_ptr()) }
-        },
-        None => {
-            unsafe { bindings::AU3_WinExists(title_wide.as_ptr(), null()) }
-        },
+        }
+        None => unsafe { bindings::AU3_WinExists(title_wide.as_ptr(), null()) },
     };
 
     r == 1
 }
 
-pub fn win_get_text(title: &str, text: Option<&str>, buf_len: Option<usize>) -> Result<String, DecodeUtf16Error> {
+pub fn win_get_text(
+    title: &str,
+    text: Option<&str>,
+    buf_len: Option<usize>,
+) -> Result<String, DecodeUtf16Error> {
     let title_wide = WideCString::from_str(title).unwrap();
 
     let buf_len = buf_len.unwrap_or(1024);
 
     let mut buf = Vec::with_capacity(buf_len as usize);
     let buf_ptr = buf.as_mut_ptr();
-    
+
     match text {
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe {
-                bindings::AU3_WinGetText(title_wide.as_ptr(), text_wide.as_ptr(), buf_ptr, buf_len as i32);
+                bindings::AU3_WinGetText(
+                    title_wide.as_ptr(),
+                    text_wide.as_ptr(),
+                    buf_ptr,
+                    buf_len as i32,
+                );
                 buf.set_len(buf_len as usize);
             }
-        },
-        None => {
-            unsafe {
-                bindings::AU3_WinGetText(title_wide.as_ptr(), null(), buf_ptr, buf_len as i32);
-                buf.set_len(buf_len as usize);
-            }
+        }
+        None => unsafe {
+            bindings::AU3_WinGetText(title_wide.as_ptr(), null(), buf_ptr, buf_len as i32);
+            buf.set_len(buf_len as usize);
         },
     }
 
     decode_utf16(buf.iter().cloned().take_while(|x| *x != '\0' as u16))
-    .collect::<Result<String, DecodeUtf16Error>>()
+        .collect::<Result<String, DecodeUtf16Error>>()
 }
 
 pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
@@ -89,16 +93,16 @@ pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe { bindings::AU3_WinWait(title_wide.as_ptr(), text_wide.as_ptr(), timeout) };
-        },
+        }
         None => {
             unsafe { bindings::AU3_WinWait(title_wide.as_ptr(), null(), timeout) };
-        },
+        }
     }
 }
 
 pub fn set_option(option: &str, value: i32) {
     let option_wide = WideCString::from_str(option).unwrap();
-    
+
     unsafe {
         bindings::AU3_AutoItSetOption(option_wide.as_ptr(), value);
     };
@@ -111,12 +115,10 @@ pub fn win_get_handle(title: &str, text: Option<&str>) -> *mut bindings::HWND__ 
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), text_wide.as_ptr()) }
-        },
-        None => {
-            unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), null()) }
-        },
+        }
+        None => unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), null()) },
     };
-    
+
     r
 }
 
@@ -127,20 +129,23 @@ pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
         Some(t) => {
             let text_wide = WideCString::from_str(t).unwrap();
             unsafe { bindings::AU3_WinSetOnTop(title_wide.as_ptr(), text_wide.as_ptr(), flag) };
-        },
+        }
         None => {
             unsafe { bindings::AU3_WinSetOnTop(title_wide.as_ptr(), null(), flag) };
-        },
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::process::{Command, Child};
+    use std::process::{Child, Command};
 
     fn launch_notepad() -> Child {
-        Command::new("notepad.exe").arg("tests\\rs-autoit test1.txt").spawn().unwrap()
+        Command::new("notepad.exe")
+            .arg("tests\\rs-autoit test1.txt")
+            .spawn()
+            .unwrap()
     }
 
     #[test]
@@ -164,9 +169,18 @@ mod tests {
         assert!(win_exists("rs-autoit test1", None));
         assert!(win_exists("rs-autoit test1", Some("aéèê")));
         assert!(!win_exists("rs-autoit test1", Some("aéèêT")));
-        assert_eq!(win_get_text("rs-autoit test1", None, None).unwrap(), "aéèê\n");
-        assert_eq!(win_get_text("rs-autoit test1", Some("aéèê"), None).unwrap(), "aéèê\n");
-        assert_ne!(win_get_text("rs-autoit test1", Some("aéèêT"), None).unwrap(), "aéèê\n");
+        assert_eq!(
+            win_get_text("rs-autoit test1", None, None).unwrap(),
+            "aéèê\n"
+        );
+        assert_eq!(
+            win_get_text("rs-autoit test1", Some("aéèê"), None).unwrap(),
+            "aéèê\n"
+        );
+        assert_ne!(
+            win_get_text("rs-autoit test1", Some("aéèêT"), None).unwrap(),
+            "aéèê\n"
+        );
 
         notepad.kill().unwrap();
     }
