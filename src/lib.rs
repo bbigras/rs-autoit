@@ -75,6 +75,15 @@ pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
     };
 }
 
+pub fn set_option(option: &str, value: i32) {
+    use widestring::WideString;
+    let wstr = WideString::from_str(option);
+    
+    unsafe {
+        bindings::AU3_AutoItSetOption(wstr.as_ptr(), value);
+    };
+}
+
 pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
     let title_ptr = str_to_lpcwstr(title);
     let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
