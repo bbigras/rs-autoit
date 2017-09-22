@@ -75,6 +75,15 @@ pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
     };
 }
 
+pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
+    let title_ptr = str_to_lpcwstr(title);
+    let text_ptr = text.map(|t| str_to_lpcwstr(t)).unwrap_or(null());
+    
+    unsafe {
+        bindings::AU3_WinSetOnTop(title_ptr, text_ptr, flag)
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
