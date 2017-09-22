@@ -134,6 +134,11 @@ pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
     }
 }
 
+pub fn send(keys: &str, flag: Option<i32>) {
+    let keys_wide = WideCString::from_str(keys).unwrap();
+    unsafe { bindings::AU3_Send(keys_wide.as_ptr(), flag.unwrap_or(0)) };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
