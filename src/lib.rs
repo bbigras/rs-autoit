@@ -14,8 +14,11 @@
 //! mouse_move(50, 50, Some(0));
 //! assert_eq!(mouse_get_pos(), (50, 50));
 //! ```
+
+extern crate failure;
 extern crate widestring;
 
+use failure::Error;
 use widestring::WideCString;
 
 use std::char::{decode_utf16, DecodeUtf16Error};
@@ -52,26 +55,26 @@ pub fn mouse_get_pos() -> (i32, i32) {
     (lp.x, lp.y)
 }
 
-pub fn win_exists(title: &str, text: Option<&str>) -> bool {
-    let title_wide = WideCString::from_str(title).unwrap();
+pub fn win_exists(title: &str, text: Option<&str>) -> Result<bool, Error> {
+    let title_wide = WideCString::from_str(title)?;
 
     let r = match text {
         Some(t) => {
-            let text_wide = WideCString::from_str(t).unwrap();
+            let text_wide = WideCString::from_str(t)?;
             unsafe { bindings::AU3_WinExists(title_wide.as_ptr(), text_wide.as_ptr()) }
         }
         None => unsafe { bindings::AU3_WinExists(title_wide.as_ptr(), null()) },
     };
 
-    r == 1
+    Ok(r == 1)
 }
 
 pub fn win_get_text(
     title: &str,
     text: Option<&str>,
     buf_len: Option<usize>,
-) -> Result<String, DecodeUtf16Error> {
-    let title_wide = WideCString::from_str(title).unwrap();
+) -> Result<String, Error> {
+    let title_wide = WideCString::from_str(title)?;
 
     let buf_len = buf_len.unwrap_or(1024);
 
@@ -80,7 +83,7 @@ pub fn win_get_text(
 
     match text {
         Some(t) => {
-            let text_wide = WideCString::from_str(t).unwrap();
+            let text_wide = WideCString::from_str(t)?;
             unsafe {
                 bindings::AU3_WinGetText(
                     title_wide.as_ptr(),
@@ -97,62 +100,73 @@ pub fn win_get_text(
         },
     }
 
-    decode_utf16(buf.iter().cloned().take_while(|x| *x != '\0' as u16))
-        .collect::<Result<String, DecodeUtf16Error>>()
+    let r = decode_utf16(buf.iter().cloned().take_while(|x| *x != '\0' as u16))
+        .collect::<Result<String, DecodeUtf16Error>>()?;
+
+    Ok(r)
 }
 
-pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) {
-    let title_wide = WideCString::from_str(title).unwrap();
+pub fn win_wait(title: &str, text: Option<&str>, timeout: Option<i32>) -> Result<(), Error> {
+    let title_wide = WideCString::from_str(title)?;
     let timeout = timeout.unwrap_or(0);
 
     match text {
         Some(t) => {
-            let text_wide = WideCString::from_str(t).unwrap();
+            let text_wide = WideCString::from_str(t)?;
             unsafe { bindings::AU3_WinWait(title_wide.as_ptr(), text_wide.as_ptr(), timeout) };
         }
         None => {
             unsafe { bindings::AU3_WinWait(title_wide.as_ptr(), null(), timeout) };
         }
-    }
+    };
+
+    Ok(())
 }
 
-pub fn set_option(option: &str, value: i32) {
-    let option_wide = WideCString::from_str(option).unwrap();
+pub fn set_option(option: &str, value: i32) -> Result<(), Error> {
+    let option_wide = WideCString::from_str(option)?;
 
     unsafe {
         bindings::AU3_AutoItSetOption(option_wide.as_ptr(), value);
     };
+
+    Ok(())
 }
 
-pub fn win_get_handle(title: &str, text: Option<&str>) -> *mut bindings::HWND__ {
-    let title_wide = WideCString::from_str(title).unwrap();
+pub fn win_get_handle(title: &str, text: Option<&str>) -> Result<*mut bindings::HWND__, Error> {
+    let title_wide = WideCString::from_str(title)?;
 
-    match text {
+    let r = match text {
         Some(t) => {
-            let text_wide = WideCString::from_str(t).unwrap();
+            let text_wide = WideCString::from_str(t)?;
             unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), text_wide.as_ptr()) }
         }
         None => unsafe { bindings::AU3_WinGetHandle(title_wide.as_ptr(), null()) },
-    }
+    };
+
+    Ok(r)
 }
 
-pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) {
-    let title_wide = WideCString::from_str(title).unwrap();
+pub fn win_set_on_top(title: &str, text: Option<&str>, flag: i32) -> Result<(), Error> {
+    let title_wide = WideCString::from_str(title)?;
 
     match text {
         Some(t) => {
-            let text_wide = WideCString::from_str(t).unwrap();
+            let text_wide = WideCString::from_str(t)?;
             unsafe { bindings::AU3_WinSetOnTop(title_wide.as_ptr(), text_wide.as_ptr(), flag) };
         }
         None => {
             unsafe { bindings::AU3_WinSetOnTop(title_wide.as_ptr(), null(), flag) };
         }
     }
+
+    Ok(())
 }
 
-pub fn send(keys: &str, flag: Option<i32>) {
-    let keys_wide = WideCString::from_str(keys).unwrap();
+pub fn send(keys: &str, flag: Option<i32>) -> Result<(), Error> {
+    let keys_wide = WideCString::from_str(keys)?;
     unsafe { bindings::AU3_Send(keys_wide.as_ptr(), flag.unwrap_or(0)) };
+    Ok(())
 }
 
 #[cfg(test)]
@@ -178,16 +192,16 @@ mod tests {
 
     #[test]
     fn test_autoit() {
-        assert!(!win_exists("rs-autoit test1", None));
+        assert!(!win_exists("rs-autoit test1", None).unwrap());
 
         let mut notepad = launch_notepad();
 
         win_wait("rs-autoit test1", None, Some(10));
         win_wait("rs-autoit test1", Some("aéèê"), Some(10));
 
-        assert!(win_exists("rs-autoit test1", None));
-        assert!(win_exists("rs-autoit test1", Some("aéèê")));
-        assert!(!win_exists("rs-autoit test1", Some("aéèêT")));
+        assert!(win_exists("rs-autoit test1", None).unwrap());
+        assert!(win_exists("rs-autoit test1", Some("aéèê")).unwrap());
+        assert!(!win_exists("rs-autoit test1", Some("aéèêT")).unwrap());
         assert_eq!(
             win_get_text("rs-autoit test1", None, None).unwrap(),
             "aéèê\n"

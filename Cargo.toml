@@ -16,6 +16,7 @@ is-it-maintained-issue-resolution = { repository = "bbigras/rs-autoit" }
 is-it-maintained-open-issues = { repository = "bbigras/rs-autoit" }
 
 [dependencies]
+failure = "0.1"
 widestring = "0.4"
 
 [build-dependencies]
