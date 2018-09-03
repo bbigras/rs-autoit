@@ -1,6 +1,6 @@
 extern crate widestring;
 
-use std::char::{DecodeUtf16Error, decode_utf16};
+use std::char::{decode_utf16, DecodeUtf16Error};
 use widestring::WideCString;
 
 use std::ptr::null;
