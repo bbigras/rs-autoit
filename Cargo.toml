@@ -1,6 +1,6 @@
 [package]
 name = "autoit"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Bruno Bigras <bigras.bruno@gmail.com>"]
 description = """
 bindings for AutoItX
