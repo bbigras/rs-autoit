@@ -1,3 +1,19 @@
+//! Rust binding for [AutoItX](https://www.autoitscript.com/site/autoit/)
+//!
+//! **(Work in progress):** If you need any function just open an issue or a PR.
+//!
+//! # Examples
+//! ```
+//! use autoit::{init, mouse_move, mouse_get_pos};
+//!
+//! init();
+//!
+//! mouse_move(0, 0, Some(0));
+//! assert_eq!(mouse_get_pos(), (0, 0));
+//!
+//! mouse_move(50, 50, Some(0));
+//! assert_eq!(mouse_get_pos(), (50, 50));
+//! ```
 extern crate widestring;
 
 use std::char::{decode_utf16, DecodeUtf16Error};

@@ -1,9 +1,24 @@
-# rs-autoit
+[![autoit crate](https://img.shields.io/crates/v/autoit.svg)](https://crates.io/crates/autoit) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/bbigras/rs-autoit.svg)](http://isitmaintained.com/project/bbigras/rs-autoit "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/bbigras/rs-autoit.svg)](http://isitmaintained.com/project/bbigras/rs-autoit "Percentage of issues still open")
+
+# autoit
+
 Rust binding for [AutoItX](https://www.autoitscript.com/site/autoit/)
 
 **(Work in progress):** If you need any function just open an issue or a PR.
 
-[![autoit crate](https://img.shields.io/crates/v/autoit.svg)](https://crates.io/crates/autoit)
+## Examples
+```rust
+use autoit::{init, mouse_move, mouse_get_pos};
+
+init();
+
+mouse_move(0, 0, Some(0));
+assert_eq!(mouse_get_pos(), (0, 0));
+
+mouse_move(50, 50, Some(0));
+assert_eq!(mouse_get_pos(), (50, 50));
+```
 
 ## Build
 
@@ -20,3 +35,5 @@ set PATH=%PATH%;c:\AutoItX
 
 set LIBCLANG_PATH=D:\LLVM\bin
 ```
+
+License: Unlicense/MIT

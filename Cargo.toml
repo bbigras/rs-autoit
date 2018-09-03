@@ -10,6 +10,11 @@ readme = "README.md"
 license = "Unlicense/MIT"
 keywords = ["autoit", "autoitx"]
 
+[badges]
+maintenance = { status = "passively-maintained" }
+is-it-maintained-issue-resolution = { repository = "bbigras/rs-autoit" }
+is-it-maintained-open-issues = { repository = "bbigras/rs-autoit" }
+
 [dependencies]
 widestring = "0.4"
 
