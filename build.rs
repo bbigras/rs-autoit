@@ -9,7 +9,7 @@ fn main() {
 
     let bindings = Builder::default()
         .header("wrapper.hpp")
-        .whitelisted_function("AU3_.*")
+        .whitelist_function("AU3_.*")
         .generate()
         .expect("Unable to generate bindings");
 

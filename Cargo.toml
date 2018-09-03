@@ -11,7 +11,7 @@ license = "Unlicense/MIT"
 keywords = ["autoit", "autoitx"]
 
 [dependencies]
-widestring = "0.2"
+widestring = "0.4"
 
 [build-dependencies]
-bindgen = "0.29"
+bindgen = "0.39"
