@@ -16,9 +16,9 @@
 //! ```
 extern crate widestring;
 
-use std::char::{decode_utf16, DecodeUtf16Error};
 use widestring::WideCString;
 
+use std::char::{decode_utf16, DecodeUtf16Error};
 use std::ptr::null;
 
 mod bindings {
