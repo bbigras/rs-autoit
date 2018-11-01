@@ -1,5 +1,6 @@
 [![autoit crate](https://img.shields.io/crates/v/autoit.svg)](https://crates.io/crates/autoit) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/bbigras/rs-autoit.svg)](http://isitmaintained.com/project/bbigras/rs-autoit "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/bbigras/rs-autoit.svg)](http://isitmaintained.com/project/bbigras/rs-autoit "Percentage of issues still open")
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=bbigras/rs-autoit)](https://dependabot.com)
 
 # autoit
 
