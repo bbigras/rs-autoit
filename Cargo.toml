@@ -17,7 +17,7 @@ is-it-maintained-open-issues = { repository = "bbigras/rs-autoit" }
 
 [dependencies]
 failure = "0.1"
-widestring = "0.4"
+widestring = "0.5"
 
 [build-dependencies]
 bindgen = "0.39"
